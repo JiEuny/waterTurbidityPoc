@@ -27,13 +27,15 @@ export default {
   methods: {
     click() {
       axios
-        // .get("http://203.253.128.179/kwater/sensor2.csv", {
-        .get(this.item, {
+        .get("http://203.253.128.179/kwater/sensor2.csv", {
+        // .get(this.item, {
           responseType: "blob",
         })
-        .then(({ response }) => {
-          const blob = new Blob([response], {
-            type: "text/csv;charset=utf8",
+        .then( response  => {
+          console.log(response)
+          const blob = new Blob([response.data], {
+            // type: "text/csv;charset=utf8",
+            type: "text/csv",
           });
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
