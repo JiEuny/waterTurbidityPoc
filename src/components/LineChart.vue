@@ -11,7 +11,7 @@ import { mixin as VueTimers } from "vue-timers";
 
 export default {
   mixins: [VueTimers],
-  props: ['rn'],
+  props: ["rn"],
   components: {
     D3LineChart,
   },
@@ -21,7 +21,6 @@ export default {
   data() {
     return {
       sen1: "",
-    //   sen2: "",
       chart_data: [],
       chart_config: {
         values: ["sensor1"],
@@ -42,9 +41,6 @@ export default {
         tooltip: {
           labels: ["Total hours", "Total production"],
         },
-        // color: {
-        //   scheme: ["#55D6BE", "#7D5BA6", "#DDDDDD", "#ACFCD9"],
-        // },
         margin: {
           top: 10,
           right: 10,
@@ -72,7 +68,9 @@ export default {
         Accept: "application/json",
       };
       const sensor1url =
-        "http://203.253.128.139:7599/wdc_base/kwater-test/"+ this.rn + "/report/la";
+        "http://203.253.128.139:7599/wdc_base/kwater-test/" +
+        this.rn +
+        "/report/la";
       axios.get(sensor1url, { headers }).then((sensorResponse) => {
         for (const [sensorkey, sensorvalue] of Object.entries(
           sensorResponse.data

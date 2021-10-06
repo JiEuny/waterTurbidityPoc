@@ -1,15 +1,9 @@
 <template>
-  <!-- <el-button class="bt" type="success" :href="item" download
-    >Download</el-button
-  > -->
-  <el-button class="bt" type="success" v-on:click="click"
-    >Download</el-button
-  >
+  <el-button class="bt" type="success" v-on:click="click">Download </el-button>
 </template>
 
 <script>
 import axios from "axios";
-import csvFile from "../assets/logo.png";
 
 export default {
   name: "hello",
@@ -21,20 +15,17 @@ export default {
       },
       baseURL: "http://203.253.128.139:7599",
       title: "sensor2.csv",
-      item: csvFile,
     };
   },
   methods: {
     click() {
       axios
         .get("http://203.253.128.179/kwater/sensor2.csv", {
-        // .get(this.item, {
           responseType: "blob",
         })
-        .then( response  => {
-          console.log(response)
+        .then((response) => {
+          console.log(response);
           const blob = new Blob([response.data], {
-            // type: "text/csv;charset=utf8",
             type: "text/csv",
           });
           const link = document.createElement("a");
@@ -44,20 +35,6 @@ export default {
           URL.revokeObjectURL(link.href);
         })
         .catch(console.error);
-    },
-    downloadFile() {
-      axios({
-        url: "./../assets/logo.png",
-        method: "GET",
-        responseType: "blob", // important
-      }).then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", "logo.png"); //or any other extension
-        document.body.appendChild(link);
-        link.click();
-      });
     },
   },
   mounted() {},
