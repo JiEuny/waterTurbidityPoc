@@ -5,7 +5,11 @@
         <div class="request">
           <el-row :gutter="20">
             <el-col :span="6" class="content">
-              <el-select v-model="value" placeholder="Select" default-first-option="true">
+              <el-select
+                v-model="value"
+                placeholder="Select"
+                default-first-option="true"
+              >
                 <el-option
                   v-for="item in options"
                   :key="item.value"
@@ -22,15 +26,7 @@
               <el-button
                 type="info"
                 @click="
-                  config(
-                    sensorID,
-                    manufacturer,
-                    geoX,
-                    geoY,
-                    managmentDep,
-                    manager,
-                    contact
-                  )
+                  config(sensorID, manufacturer, managmentDep, manager, contact)
                 "
               >
                 설정
@@ -143,9 +139,9 @@ export default {
         "X-M2M-RI": "12345",
         "X-M2M-Origin": "SM",
         Accept: "application/json",
-        "Content-Type": "application/json; ty=4",
+        "Content-Type": "application/json",
       },
-      baseURL: "http://203.253.128.139:7599/wdc_base/kwater-test/",
+      baseURL: "http://203.253.128.139:7599/wdc_base/kwater-poc/",
       sensorID: "",
       manufacturer: "",
       geoX: "",
@@ -159,60 +155,38 @@ export default {
     infoSetting() {
       const sensor1URL = this.baseURL + "sensor1";
       axios.get(sensor1URL, { headers: this.headers }).then((response) => {
-        for (const [sensorkey, sensorvalue] of Object.entries(response.data)) {
-          for (const [sensorkey2, sensorvalue2] of Object.entries(
-            sensorvalue
-          )) {
-            if (sensorkey2 == "loc") {
-              this.geoX = sensorvalue2.crd[0];
-              this.geoY = sensorvalue2.crd[1];
-            }
-          }
-        }
-      });
-      const sensor1InfoURL = sensor1URL + "/la"
-      axios.get(sensor1InfoURL, { headers: this.headers }).then((response) => {
-        for (const [sensorkey, sensorvalue] of Object.entries(response.data)) {
-          for (const [sensorkey2, sensorvalue2] of Object.entries(
-            sensorvalue
-          )) {
-            if (sensorkey2 == "con") {
-              this.sensorID = sensorvalue2.sensorID;
-              this.manufacturer = sensorvalue2.manufacturer;
-              this.managmentDep = sensorvalue2.managmentDep;
-              this.manager = sensorvalue2.manager;
-              this.contact = sensorvalue2.contact;
-            }
+        for (const [key, value] of Object.entries(response.data)) {
+          this.geoX = value.loc.crd[0];
+          this.geoY = value.loc.crd[1];
+          for (const lbl of value.lbl) {
+            if (lbl.split(":")[0] == "sensorID")
+              this.sensorID = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "manufacturer")
+              this.manufacturer = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "managmentDep")
+              this.managmentDep = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "manager")
+              this.manager = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "contact")
+              this.contact = lbl.split(":")[1];
           }
         }
       });
     },
-    config: function (
-      sensorID,
-      manufacturer,
-      geoX,
-      geoY,
-      managmentDep,
-      manager,
-      contact
-    ) {
+    config: function (sensorID, manufacturer, managmentDep, manager, contact) {
       const sensorURL = this.baseURL + this.value;
       const body = {
-        "m2m:cin": {
-          con: {
-            sensorID: sensorID,
-            manufacturer: manufacturer,
-            managmentDep: managmentDep,
-            manager: manager,
-            contact: contact,
-          },
+        "wat:wqmi": {
+          lbl: [
+            "sensorID:" + sensorID,
+            "manufacturer:" + manufacturer,
+            "managmentDep:" + managmentDep,
+            "manager:" + manager,
+            "contact:" + contact,
+          ],
         },
       };
-      axios
-        .post(sensorURL, body, { headers: this.headers })
-        .then((response) => {
-          console.log(response.data);
-        });
+      axios.put(sensorURL, body, { headers: this.headers }).then(() => {});
     },
   },
   mounted() {

@@ -68,20 +68,14 @@ export default {
         Accept: "application/json",
       };
       const sensor1url =
-        "http://203.253.128.139:7599/wdc_base/kwater-test/" +
+        "http://203.253.128.139:7599/wdc_base/kwater-poc/" +
         this.rn +
-        "/report/la";
+        "/WtqltGnrlMesureIem";
       axios.get(sensor1url, { headers }).then((sensorResponse) => {
         for (const [sensorkey, sensorvalue] of Object.entries(
           sensorResponse.data
         )) {
-          for (const [sensorkey2, sensorvalue2] of Object.entries(
-            sensorvalue
-          )) {
-            if (sensorkey2 == "con") {
-              this.sen1 = sensorvalue2;
-            }
-          }
+          this.sen1 = sensorvalue.ntu
         }
       });
       this.chart_data.push({
