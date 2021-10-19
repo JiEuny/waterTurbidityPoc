@@ -24,7 +24,7 @@
                       >
                         {{ sensor.rn }}
                       </el-button>
-                      <Download></Download>
+                      <Download v-bind:rn="sensor.rn"></Download>
                     </el-col>
                     <el-col :span="4">
                       <GaugeChart

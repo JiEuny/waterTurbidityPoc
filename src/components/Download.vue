@@ -7,6 +7,7 @@ import axios from "axios";
 
 export default {
   name: "hello",
+  props: ["rn"],
   data() {
     return {
       headers: {
@@ -20,7 +21,7 @@ export default {
   methods: {
     click() {
       axios
-        .get("http://203.253.128.179/kwater/sensor2.csv", {
+        .get("http://203.253.128.179/kwater/" + this.rn + ".csv", {
           responseType: "blob",
         })
         .then((response) => {
@@ -30,7 +31,7 @@ export default {
           });
           const link = document.createElement("a");
           link.href = URL.createObjectURL(blob);
-          link.download = "sensor2.csv";
+          link.download = this.rn + ".csv";
           link.click();
           URL.revokeObjectURL(link.href);
         })

@@ -19,19 +19,23 @@
                 </el-option>
               </el-select>
             </el-col>
-            <el-col :span="4" class="content"></el-col>
-            <el-col :span="6" class="content"></el-col>
-            <el-col :span="1" class="content"></el-col>
-            <el-col :span="4">
+            <el-col :span="4" class="content">
+              <el-button type="info" @click="configGet()">
+                센서 불러오기
+              </el-button>
+            </el-col>
+            <el-col :span="5" class="content">
               <el-button
                 type="info"
                 @click="
-                  config(sensorID, manufacturer, managmentDep, manager, contact)
+                  config(sensorID, manufacturer, managmentDep, manager, contact, geoX, geoY)
                 "
               >
-                설정
+                센서 업데이트
               </el-button>
             </el-col>
+            <el-col :span="1" class="content"></el-col>
+            <el-col :span="4"> </el-col>
             <el-col :span="3" class="content"></el-col>
           </el-row>
           <br />
@@ -144,8 +148,8 @@ export default {
       baseURL: "http://203.253.128.139:7599/wdc_base/kwater-poc/",
       sensorID: "",
       manufacturer: "",
-      geoX: "",
-      geoY: "",
+      geoX: 0,
+      geoY: 0,
       managmentDep: "",
       manager: "",
       contact: "",
@@ -173,7 +177,7 @@ export default {
         }
       });
     },
-    config: function (sensorID, manufacturer, managmentDep, manager, contact) {
+    config: function (sensorID, manufacturer, managmentDep, manager, contact, geoX, geoY) {
       const sensorURL = this.baseURL + this.value;
       const body = {
         "wat:wqmi": {
@@ -184,9 +188,36 @@ export default {
             "manager:" + manager,
             "contact:" + contact,
           ],
+          loc: {
+            typ: 1,
+            crd: [
+              geoX, geoY
+            ]
+          }
         },
       };
       axios.put(sensorURL, body, { headers: this.headers }).then(() => {});
+    },
+    configGet() {
+      const sensor1URL = this.baseURL + this.value;
+      axios.get(sensor1URL, { headers: this.headers }).then((response) => {
+        for (const [key, value] of Object.entries(response.data)) {
+          this.geoX = value.loc.crd[0];
+          this.geoY = value.loc.crd[1];
+          for (const lbl of value.lbl) {
+            if (lbl.split(":")[0] == "sensorID")
+              this.sensorID = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "manufacturer")
+              this.manufacturer = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "managmentDep")
+              this.managmentDep = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "manager")
+              this.manager = lbl.split(":")[1];
+            else if (lbl.split(":")[0] == "contact")
+              this.contact = lbl.split(":")[1];
+          }
+        }
+      });
     },
   },
   mounted() {
